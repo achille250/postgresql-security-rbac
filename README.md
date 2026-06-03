@@ -72,9 +72,3 @@ Use `table_ownership_audit_template.txt` before/after schema migrations to avoid
 | [postgresql-ha-replication](https://github.com/achille250/postgresql-ha-replication) | Replication auth (SCRAM, slots) |
 | [postgresql-monitoring-stack](https://github.com/achille250/postgresql-monitoring-stack) | Monitoring user setup |
 | [postgresql-performance-tuning](https://github.com/achille250/postgresql-performance-tuning) | Schema constraints |
-
----
-
-## License
-
-MIT — see [LICENSE](LICENSE).
