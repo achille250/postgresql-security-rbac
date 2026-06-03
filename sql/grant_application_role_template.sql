@@ -1,0 +1,18 @@
+-- Application role template (least privilege)
+
+CREATE ROLE app_readwrite LOGIN PASSWORD 'CHANGE_ME_STRONG_PASSWORD';
+
+GRANT CONNECT ON DATABASE app_db TO app_readwrite;
+GRANT USAGE ON SCHEMA public TO app_readwrite;
+
+GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO app_readwrite;
+GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO app_readwrite;
+
+ALTER DEFAULT PRIVILEGES IN SCHEMA public
+  GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO app_readwrite;
+
+ALTER DEFAULT PRIVILEGES IN SCHEMA public
+  GRANT USAGE, SELECT ON SEQUENCES TO app_readwrite;
+
+-- Revoke public schema create from PUBLIC (hardening)
+REVOKE CREATE ON SCHEMA public FROM PUBLIC;
