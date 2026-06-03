@@ -1,49 +1,80 @@
-# Database security & RBAC practices
+# PostgreSQL Security & RBAC
 
-Patterns applied in enterprise PostgreSQL environments (financial / public-sector systems).
+Role-based access control, **Row-Level Security (RLS)**, audit logging patterns, replication authentication, and object ownership audit templates for enterprise PostgreSQL.
 
-## Principles
+**Author:** [Achille Cesar Ntwali](https://github.com/achille250) · Kigali, Rwanda
 
-1. **Least privilege** — Application roles receive only required DML/DDL on specific schemas; no superuser for apps.
-2. **Separation of duties** — DBA admin roles distinct from application and replication users.
-3. **SCRAM-SHA-256** — Password encryption for PostgreSQL 14+ (`password_encryption = scram-sha-256`).
-4. **Replication user** — `REPLICATION` attribute only; restricted in `pg_hba.conf` by source IP.
-5. **Auditing** — DDL logging, connection logging, pgAudit or equivalent for sensitive schemas.
-6. **Ownership hygiene** — Tables owned by module/schema owners, not mixed personal accounts (see template below).
+---
 
-## Replication authentication example
+## Overview
+
+Security primitives for multi-tenant and public-sector financial systems: least-privilege application roles, separated replication users, session context for RLS, and DDL/connection logging baselines.
+
+---
+
+## Repository structure
+
+```
+postgresql-security-rbac/
+├── sql/
+│   ├── grant_application_role_template.sql  # App role: CONNECT, schema grants
+│   ├── row_level_security_example.sql       # RLS policies + session context
+│   └── audit_logging_template.sql           # log_statement, connections
+├── table_ownership_audit_template.txt       # Document object owners pre/post migration
+└── README.md (this file)
+```
+
+---
+
+## Quick start
+
+### Application role (least privilege)
 
 ```sql
-CREATE ROLE replicator WITH REPLICATION LOGIN PASSWORD 'use_vault_or_secret_file';
+\i sql/grant_application_role_template.sql
+-- Replace app_db, app_readwrite, passwords
 ```
 
-```
-# pg_hba.conf
-host  replication  replicator  <REPLICA_IP>/32  scram-sha-256
-```
-
-## Application role example
+### Row-Level Security
 
 ```sql
-CREATE ROLE ifmis_app LOGIN PASSWORD '...';
-GRANT CONNECT ON DATABASE ifmis_db TO ifmis_app;
-GRANT USAGE ON SCHEMA public TO ifmis_app;
-GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO ifmis_app;
-ALTER DEFAULT PRIVILEGES IN SCHEMA public
-  GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO ifmis_app;
+\i sql/row_level_security_example.sql
+-- Set per session: SELECT set_config('app.current_entity_id', '<uuid>', false);
 ```
 
-## Monitoring user (non-superuser)
+### Audit baseline
 
 ```sql
-CREATE ROLE postgres_exporter LOGIN PASSWORD '...';
-GRANT pg_monitor TO postgres_exporter;
+\i sql/audit_logging_template.sql
+-- Production: prefer pgAudit for comprehensive audit trails
 ```
 
-## Ownership audit
+### Ownership review
 
-Use `table_ownership_audit_template.txt` in this folder to document object owners before and after migrations.
+Use `table_ownership_audit_template.txt` before/after schema migrations to avoid orphaned or personal-account owners.
 
-## Related automation
+---
 
-Replica provisioning with secret files and `.pgpass` (mode 600): see `04-high-availability-replication/scripts/add_replica_v1.sh`.
+## Security checklist
+
+- [ ] SCRAM-SHA-256 for passwords (`password_encryption`)
+- [ ] No superuser for applications
+- [ ] Replication user: `REPLICATION` only, IP-restricted in `pg_hba.conf`
+- [ ] Monitoring user: `pg_monitor` only
+- [ ] Revoke `CREATE` on `public` from `PUBLIC` where applicable
+
+---
+
+## Related repositories
+
+| Repo | Focus |
+|------|--------|
+| [postgresql-ha-replication](https://github.com/achille250/postgresql-ha-replication) | Replication auth (SCRAM, slots) |
+| [postgresql-monitoring-stack](https://github.com/achille250/postgresql-monitoring-stack) | Monitoring user setup |
+| [postgresql-performance-tuning](https://github.com/achille250/postgresql-performance-tuning) | Schema constraints |
+
+---
+
+## License
+
+MIT — see [LICENSE](LICENSE).
