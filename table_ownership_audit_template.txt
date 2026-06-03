@@ -1,0 +1,48 @@
+OWNER JEROME
+--------------
+acc_account_balance
+as_asset_category_account
+ass_asset
+ass_asset_category
+opr_report_filter
+opr_report_column
+opr_operational_report
+
+ OWNER  POSTGRES
+ --------------
+ adm_staff
+ bnr_incirep_table
+ bnr_glmaps_table
+ bnr_fraudtxn_table
+ bnr_exauditors_table
+ bnr_readiness_table
+ bnr_staffinfo_table
+ bnr_suspitxn_table
+ crb_shareholders
+ op_cash_transfer_detail
+ pro_loan_account_history
+ pro_loan_account_classification
+ 
+ 
+ OWNER SYLVAIN
+ --------------
+ ass_stock_item
+ ass_stock_category
+ ass_stock
+ ass_stock_transaction
+ bnr_report_tracking
+ borrowing
+ borrowing_repayment
+ borrowing_type
+ sec_system_log
+ 
+ EMPTY TABLES
+ ------------
+ bnr_mfiimple2_table
+ bnr_mfienbezz2_table
+ bnr_mfilegal_table
+ bnr_mfilodef2_table
+ bnr_mfimismgt2_table
+ bnr_mfirobbery2_table
+ bnr_mgtinfo2_table
+ bnr_suspitxn_table
